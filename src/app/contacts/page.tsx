@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from "react";
 import {
     Search, Filter, CheckCircle2, Clock, MoreHorizontal, Plus, Users, X,
-    User, Phone, Loader2, Edit2, Trash2, Power, PowerOff, AlertTriangle
+    User, Phone, Loader2, Edit2, Trash2, Power, PowerOff, AlertTriangle,
+    ChevronLeft, ChevronRight
 } from "lucide-react";
 import { useLang } from "@/context/LangContext";
 import { apiFetch } from "@/lib/apiFetch";
@@ -15,6 +16,13 @@ export default function ContactsPage() {
     const [contacts, setContacts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    // Pagination States
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const limit = 20;
 
     // Modal & Menu States
     const [showModal, setShowModal] = useState(false);
@@ -33,17 +41,37 @@ export default function ContactsPage() {
 
     const menuRef = useRef<HTMLDivElement>(null);
 
-    const fetchContacts = () => {
+    const fetchContacts = (page: number = 1, searchQuery: string = "") => {
         setLoading(true);
-        apiFetch(`/contacts`)
+        const params = new URLSearchParams({
+            page: page.toString(),
+            limit: limit.toString(),
+            search: searchQuery
+        });
+
+        apiFetch(`/contacts?${params.toString()}`)
             .then((r) => r.json())
-            .then((data) => { setContacts(Array.isArray(data) ? data : []); setLoading(false); })
+            .then((res) => {
+                setContacts(Array.isArray(res.data) ? res.data : []);
+                setTotalPages(res.totalPages || 1);
+                setTotalItems(res.total || 0);
+                setLoading(false);
+            })
             .catch(() => setLoading(false));
     };
 
+    // debouncing search
     useEffect(() => {
-        fetchContacts();
-    }, []);
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+            setCurrentPage(1); // Reset to page 1 on new search
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    useEffect(() => {
+        fetchContacts(currentPage, debouncedSearch);
+    }, [currentPage, debouncedSearch]);
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -102,7 +130,7 @@ export default function ContactsPage() {
                     setError(t.locale === 'it' ? "Questo contatto esiste già." : "Este contacto ya existe.");
                 } else {
                     setShowModal(false);
-                    fetchContacts();
+                    fetchContactsWithCurrent();
                 }
             } else {
                 setError(data.error || "Error al guardar");
@@ -121,7 +149,7 @@ export default function ContactsPage() {
             const res = await apiFetch(`/contacts/${selectedContact.id}`, { method: "DELETE" });
             if (res.ok) {
                 setShowDeleteConfirm(false);
-                fetchContacts();
+                fetchContactsWithCurrent();
             }
         } catch (err) {
             alert("Error al eliminar");
@@ -145,10 +173,7 @@ export default function ContactsPage() {
         }
     };
 
-    const filtered = contacts.filter((c) =>
-        (c.name || "").toLowerCase().includes(search.toLowerCase()) ||
-        (c.phone || "").includes(search)
-    );
+    const fetchContactsWithCurrent = () => fetchContacts(currentPage, debouncedSearch);
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
@@ -199,8 +224,8 @@ export default function ContactsPage() {
                                     </td>
                                 </tr>
                             ))
-                        ) : filtered.length > 0 ? (
-                            filtered.map((contact) => (
+                        ) : contacts.length > 0 ? (
+                            contacts.map((contact) => (
                                 <tr key={contact.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)", transition: "background 0.2s" }} className="table-row">
                                     <td style={{ padding: "1.25rem 1.5rem" }}>
                                         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
@@ -303,6 +328,59 @@ export default function ContactsPage() {
                     </tbody>
                 </table>
             </div>
+
+            {/* Pagination Controls */}
+            {!loading && totalPages > 1 && (
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", padding: "1rem", background: "rgba(15,23,42,0.2)", borderRadius: "1.5rem" }}>
+                    <div style={{ color: "#64748b", fontSize: "0.875rem" }}>
+                        {C.showing} <span style={{ color: "#f8fafc", fontWeight: 600 }}>{((currentPage - 1) * limit) + 1}</span> - <span style={{ color: "#f8fafc", fontWeight: 600 }}>{Math.min(currentPage * limit, totalItems)}</span> {C.of} <span style={{ color: "#f8fafc", fontWeight: 600 }}>{totalItems}</span> {C.total}
+                    </div>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <button
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            style={{ padding: "0.5rem", borderRadius: "0.75rem", background: "rgba(255,255,255,0.05)", border: "none", color: currentPage === 1 ? "#334155" : "#f8fafc", cursor: currentPage === 1 ? "default" : "pointer", opacity: currentPage === 1 ? 0.5 : 1 }}
+                        >
+                            <ChevronLeft style={{ width: 20, height: 20 }} />
+                        </button>
+
+                        <div style={{ display: "flex", gap: "0.25rem" }}>
+                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                // Simple logic to show a few pages around current
+                                let pageNum = currentPage;
+                                if (totalPages <= 5) pageNum = i + 1;
+                                else if (currentPage <= 3) pageNum = i + 1;
+                                else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                                else pageNum = currentPage - 2 + i;
+
+                                return (
+                                    <button
+                                        key={pageNum}
+                                        onClick={() => setCurrentPage(pageNum)}
+                                        style={{
+                                            width: 36, height: 36, borderRadius: "0.75rem",
+                                            background: currentPage === pageNum ? "#10b981" : "transparent",
+                                            border: "none", color: currentPage === pageNum ? "white" : "#64748b",
+                                            fontWeight: 700, cursor: "pointer", transition: "all 0.2s"
+                                        }}
+                                    >
+                                        {pageNum}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <button
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            style={{ padding: "0.5rem", borderRadius: "0.75rem", background: "rgba(255,255,255,0.05)", border: "none", color: currentPage === totalPages ? "#334155" : "#f8fafc", cursor: currentPage === totalPages ? "default" : "pointer", opacity: currentPage === totalPages ? 0.5 : 1 }}
+                        >
+                            <ChevronRight style={{ width: 20, height: 20 }} />
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Modal de Agregar/Editar Contacto */}
             {showModal && (

@@ -66,7 +66,13 @@ export const translations = {
             deactivate: 'Disattiva',
             confirmDelete: 'Sei sicuro di voler eliminare questo contatto?',
             save: 'Salva',
-            cancel: 'Annulla'
+            cancel: 'Annulla',
+            next: 'Successivo',
+            previous: 'Precedente',
+            page: 'Pagina',
+            showing: 'Mostrando',
+            of: 'di',
+            total: 'totale'
         },
         import: {
             title: 'Importa Database',
@@ -178,7 +184,13 @@ export const translations = {
             deactivate: 'Desactivar',
             confirmDelete: '¿Estás seguro de que deseas eliminar este contacto?',
             save: 'Guardar',
-            cancel: 'Cancelar'
+            cancel: 'Cancelar',
+            next: 'Siguiente',
+            previous: 'Anterior',
+            page: 'Página',
+            showing: 'Mostrando',
+            of: 'de',
+            total: 'total'
         },
         import: {
             title: 'Importar Base de Datos',

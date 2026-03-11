@@ -12,6 +12,7 @@ const DAYS_ES = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 interface StatusData {
   whatsapp: { status: string; phoneNumber?: string; name?: string; quality?: string; error?: string };
   contacts: { total: number; sent: number; pending: number; failed: number; deliveryRate: number };
+  chart: number[];
   config: { messagesPerDay: number; delayBetweenMessages: number };
 }
 
@@ -33,6 +34,13 @@ export default function Dashboard() {
       .then((r) => r.json())
       .then((data: StatusData) => {
         setStatus(data);
+        if (data.chart) {
+          const chartData = DAYS.map((name, idx) => ({
+            name,
+            envios: data.chart[idx] || 0
+          }));
+          setChart(chartData);
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -40,21 +48,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchStatus();
-
-    apiFetch("/contacts")
-      .then((r) => r.json())
-      .then((contacts: any[]) => {
-        if (!Array.isArray(contacts)) return;
-        const chartData = DAYS.map((name, idx) => ({
-          name,
-          envios: contacts.filter((c) => {
-            if (!c.createdAt) return false;
-            const ms = c.createdAt._seconds ? c.createdAt._seconds * 1000 : new Date(c.createdAt).getTime();
-            return new Date(ms).getDay() === idx && c.messageSent;
-          }).length,
-        }));
-        setChart(chartData);
-      });
   }, []);
 
   const showToast = (type: 'success' | 'error', message: string) => {
