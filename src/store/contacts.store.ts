@@ -28,7 +28,7 @@ export const useContactsStore = create<ContactsState>((set) => ({
             set({ loading: false });
         }
     },
-    addContact: async (contact) => {
+    addContact: async (contact: Partial<Contact>) => {
         // API call here
     },
 }));
