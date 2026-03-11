@@ -20,19 +20,19 @@ export default function RootLayout({
   return (
     <html lang="it">
       <body
-        className={outfit.className}
+        className={`${outfit.className} body-layout`}
         style={{
           background: "hsl(240 10% 3.9%)",
           color: "hsl(0 0% 98%)",
-          display: "flex",
           minHeight: "100vh",
-          overflow: "hidden",
+          display: "flex"
         }}
       >
         <LangProvider>
           <AuthGuard>
             <Sidebar />
             <main
+              className="main-content"
               style={{
                 flex: 1,
                 overflowY: "auto",

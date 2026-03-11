@@ -9,6 +9,7 @@
   --color-card-foreground: hsl(0 0% 98%);
   --color-muted: hsl(240 3.7% 15.9%);
   --color-muted-foreground: hsl(240 5% 64.9%);
+  --color-muted-foreground: hsl(240 5% 64.9%);
   --color-border: hsl(240 3.7% 15.9%);
   --color-ring: hsl(142.1 70.6% 45.3%);
 }
@@ -80,4 +81,62 @@ body {
 
 .btn-primary:active {
   transform: scale(0.95);
+}
+
+/* Responsive Utilities */
+.desktop-only {
+  display: flex !important;
+}
+
+.mobile-only {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: flex !important;
+  }
+
+  .main-content {
+    padding: 1rem !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .glass {
+    padding: 1.5rem !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .body-layout {
+    flex-direction: column !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  header h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }

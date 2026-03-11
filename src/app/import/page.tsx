@@ -71,9 +71,9 @@ export default function ImportPage() {
                 )}
             </div>
 
-            <div className="glass" style={{ borderRadius: "1.5rem", padding: "2rem" }}>
-                <h3 style={{ fontWeight: 700, marginBottom: "1rem" }}>{I.requirements}</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+            <div className="glass" style={{ borderRadius: "1.5rem", padding: "1.5rem" }}>
+                <h3 style={{ fontWeight: 700, marginBottom: "1.5rem" }}>{I.requirements}</h3>
+                <div className="stats-grid" style={{ display: "grid", gap: "0.75rem" }}>
                     {[I.req1, I.req2, I.req3, I.req4].map((r) => (
                         <div key={r} style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "1rem", background: "rgba(255,255,255,0.03)", borderRadius: "0.75rem", fontSize: "0.875rem", color: "#64748b" }}>
                             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", flexShrink: 0 }} />{r}

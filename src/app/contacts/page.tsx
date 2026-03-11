@@ -181,12 +181,12 @@ export default function ContactsPage() {
                 </button>
             </div>
 
-            <div className="glass" style={{ borderRadius: "2rem", overflow: "visible" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+            <div className="table-responsive" style={{ background: "rgba(15,23,42,0.3)", borderRadius: "2rem", overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", minWidth: "600px" }}>
                     <thead>
                         <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                             {[C.name, C.phone, C.status, C.actions].map((h, i) => (
-                                <th key={h} style={{ padding: "1.25rem 2rem", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#475569", textAlign: i === 3 ? "right" : "left" }}>{h}</th>
+                                <th key={h} style={{ padding: "1.25rem 1.5rem", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#475569", textAlign: i === 3 ? "right" : "left" }}>{h}</th>
                             ))}
                         </tr>
                     </thead>
@@ -194,7 +194,7 @@ export default function ContactsPage() {
                         {loading ? (
                             [1, 2, 3, 4].map((i) => (
                                 <tr key={i}>
-                                    <td colSpan={4} style={{ padding: "1.5rem 2rem" }}>
+                                    <td colSpan={4} style={{ padding: "1.5rem 1.5rem" }}>
                                         <div style={{ height: "2rem", background: "rgba(255,255,255,0.02)", borderRadius: "0.5rem", animation: "pulse 2s infinite" }}></div>
                                     </td>
                                 </tr>
@@ -202,7 +202,7 @@ export default function ContactsPage() {
                         ) : filtered.length > 0 ? (
                             filtered.map((contact) => (
                                 <tr key={contact.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)", transition: "background 0.2s" }} className="table-row">
-                                    <td style={{ padding: "1.25rem 2rem" }}>
+                                    <td style={{ padding: "1.25rem 1.5rem" }}>
                                         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                                             <div style={{ width: 38, height: 38, borderRadius: "50%", background: contact.active ? "rgba(16,185,129,0.12)" : "rgba(100,116,139,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: contact.active ? "#10b981" : "#64748b", fontWeight: 700, fontSize: "0.875rem" }}>
                                                 {(contact.name || "?").charAt(0).toUpperCase()}
@@ -210,8 +210,8 @@ export default function ContactsPage() {
                                             <span style={{ fontWeight: 600, opacity: contact.active ? 1 : 0.5 }}>{contact.name}</span>
                                         </div>
                                     </td>
-                                    <td style={{ padding: "1.25rem 2rem", color: "#64748b", opacity: contact.active ? 1 : 0.5 }}>{contact.phone}</td>
-                                    <td style={{ padding: "1.25rem 2rem" }}>
+                                    <td style={{ padding: "1.25rem 1.5rem", color: "#64748b", opacity: contact.active ? 1 : 0.5 }}>{contact.phone}</td>
+                                    <td style={{ padding: "1.25rem 1.5rem" }}>
                                         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                                             {contact.messageSent ? (
                                                 <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.25rem 0.75rem", borderRadius: "999px", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", color: "#10b981", background: "rgba(16,185,129,0.1)" }}>
@@ -246,7 +246,7 @@ export default function ContactsPage() {
                                             </button>
                                         </div>
                                     </td>
-                                    <td style={{ padding: "1.25rem 2rem", textAlign: "right", position: "relative" }}>
+                                    <td style={{ padding: "1.25rem 1.5rem", textAlign: "right", position: "relative" }}>
                                         <button
                                             onClick={() => setOpenMenuId(openMenuId === contact.id ? null : contact.id)}
                                             style={{ background: "transparent", border: "none", cursor: "pointer", color: "#64748b", padding: "0.5rem" }}

@@ -100,10 +100,13 @@ export default function Dashboard() {
       {notification && (
         <div style={{
           position: "fixed",
-          top: "2rem",
-          right: "2rem",
+          top: "1.5rem",
+          left: "50%",
+          transform: "translateX(-50%)",
           zIndex: 1000,
-          animation: "slideIn 0.3s ease-out forwards"
+          animation: "slideIn 0.3s ease-out forwards",
+          width: "calc(100% - 2rem)",
+          maxWidth: "400px"
         }}>
           <div style={{
             background: notification.type === 'success' ? "rgba(16,185,129,0.95)" : "rgba(239,68,68,0.95)",
@@ -115,7 +118,6 @@ export default function Dashboard() {
             display: "flex",
             alignItems: "center",
             gap: "1rem",
-            minWidth: "300px",
             border: "1px solid rgba(255,255,255,0.1)"
           }}>
             {notification.type === 'success' ? <CheckCircle2 style={{ width: 24, height: 24 }} /> : <AlertCircle style={{ width: 24, height: 24 }} />}
@@ -130,20 +132,23 @@ export default function Dashboard() {
         </div>
       )}
 
+      <header style={{ marginTop: "4rem" }} className="mobile-only" />
+      <header className="desktop-only" />
+
       <header>
         <h2 style={{ fontSize: "1.875rem", fontWeight: 700, letterSpacing: "-0.02em" }}>{D.title}</h2>
         <p style={{ color: "#64748b", marginTop: "0.25rem" }}>{D.subtitle}</p>
       </header>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1.5rem" }}>
+      <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1.5rem" }}>
         <StatCard title={D.totalContacts} value={(c?.total ?? 0).toLocaleString()} sub={D.imported} icon={Users} />
         <StatCard title={D.sent} value={(c?.sent ?? 0).toLocaleString()} sub={D.total} icon={Send} color="#10b981" />
         <StatCard title={D.pending} value={(c?.pending ?? 0).toLocaleString()} sub={D.queue} icon={Clock} color="#f59e0b" />
         <StatCard title={D.rate} value={`${c?.deliveryRate ?? 0}%`} sub={D.average} icon={TrendingUp} color="#3b82f6" />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "2rem" }}>
+      <div className="dashboard-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "2rem" }}>
         {/* Chart */}
         <div className="glass" style={{ borderRadius: "1.5rem", padding: "2rem" }}>
           <h3 style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "1.5rem" }}>{D.chartTitle}</h3>

@@ -65,8 +65,8 @@ export default function ConfigPage() {
     };
 
     return (
-        <div style={{ maxWidth: 640, display: "flex", flexDirection: "column", gap: "2rem" }}>
-            <header style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <div style={{ width: "100%", maxWidth: 640, display: "flex", flexDirection: "column", gap: "2rem" }}>
+            <header style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem" }}>
                 <div style={{ width: 48, height: 48, background: "rgba(16,185,129,0.1)", borderRadius: "1rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <Settings style={{ width: 24, height: 24, color: "#10b981" }} />
                 </div>

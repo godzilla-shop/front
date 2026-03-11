@@ -42,7 +42,7 @@ export default function HistoryPage() {
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-            <header style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <header style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem" }}>
                 <div style={{ width: 48, height: 48, background: "rgba(16,185,129,0.1)", borderRadius: "1rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <Activity style={{ width: 24, height: 24, color: "#10b981" }} />
                 </div>
@@ -52,7 +52,7 @@ export default function HistoryPage() {
                 </div>
             </header>
 
-            <div className="glass" style={{ borderRadius: "2rem", overflow: "hidden" }}>
+            <div className="table-responsive" style={{ background: "rgba(15,23,42,0.3)", borderRadius: "2rem", overflowX: "auto" }}>
                 {loading ? (
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "5rem", gap: "0.75rem", color: "#10b981" }}>
                         <Loader2 style={{ width: 24, height: 24, animation: "spin 1s linear infinite" }} />
@@ -61,11 +61,11 @@ export default function HistoryPage() {
                 ) : contacts.length === 0 ? (
                     <div style={{ padding: "5rem", textAlign: "center", color: "#64748b", fontWeight: 500 }}>{H.empty}</div>
                 ) : (
-                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", minWidth: "600px" }}>
                         <thead>
                             <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                 {[H.contact, H.phone, H.status, H.date].map((h) => (
-                                    <th key={h} style={{ padding: "1.25rem 2rem", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#475569" }}>{h}</th>
+                                    <th key={h} style={{ padding: "1.25rem 1.5rem", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#475569" }}>{h}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -75,14 +75,14 @@ export default function HistoryPage() {
                                 const Icon = cfg.icon;
                                 return (
                                     <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
-                                        <td style={{ padding: "1.25rem 2rem", fontWeight: 600 }}>{item.name || "—"}</td>
-                                        <td style={{ padding: "1.25rem 2rem", color: "#64748b" }}>{item.phone}</td>
-                                        <td style={{ padding: "1.25rem 2rem" }}>
+                                        <td style={{ padding: "1.25rem 1.5rem", fontWeight: 600 }}>{item.name || "—"}</td>
+                                        <td style={{ padding: "1.25rem 1.5rem", color: "#64748b" }}>{item.phone}</td>
+                                        <td style={{ padding: "1.25rem 1.5rem" }}>
                                             <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.25rem 0.75rem", borderRadius: "999px", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", ...cfg.style }}>
                                                 <Icon style={{ width: 12, height: 12 }} />{cfg.label}
                                             </div>
                                         </td>
-                                        <td style={{ padding: "1.25rem 2rem", color: "#64748b", fontSize: "0.875rem" }}>{fmtDate(item.updatedAt || item.createdAt)}</td>
+                                        <td style={{ padding: "1.25rem 1.5rem", color: "#64748b", fontSize: "0.875rem" }}>{fmtDate(item.updatedAt || item.createdAt)}</td>
                                     </tr>
                                 );
                             })}
