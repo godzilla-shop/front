@@ -1,7 +1,7 @@
 import { auth } from './firebase';
 import axios, { InternalAxiosRequestConfig } from 'axios';
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api').replace(/\/$/, '');
 
 const api = axios.create({
     baseURL: baseUrl,

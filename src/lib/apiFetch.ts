@@ -22,9 +22,10 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
         delete headers['Content-Type'];
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api').replace(/\/$/, '');
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
 
-    return fetch(`${baseUrl}${path}`, {
+    return fetch(`${baseUrl}${cleanPath}`, {
         ...options,
         headers,
     });
