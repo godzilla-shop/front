@@ -72,7 +72,10 @@ export const translations = {
             page: 'Pagina',
             showing: 'Mostrando',
             of: 'di',
-            total: 'totale'
+            total: 'totale',
+            bulkActivate: 'Attiva tutti i "{search}"',
+            bulkDeactivate: 'Disattiva tutti i "{search}"',
+            confirmBulk: 'Sei sicuro di voler cambiare lo stato di tutti i contatti che corrispondono a "{search}"?'
         },
         import: {
             title: 'Importa Database',
@@ -190,7 +193,10 @@ export const translations = {
             page: 'Página',
             showing: 'Mostrando',
             of: 'de',
-            total: 'total'
+            total: 'total',
+            bulkActivate: 'Activar todos los "{search}"',
+            bulkDeactivate: 'Desactivar todos los "{search}"',
+            confirmBulk: '¿Estás seguro de que deseas cambiar el estado de todos los contactos que coinciden con "{search}"?'
         },
         import: {
             title: 'Importar Base de Datos',

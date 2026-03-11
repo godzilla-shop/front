@@ -173,6 +173,28 @@ export default function ContactsPage() {
         }
     };
 
+    const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+    const [showBulkConfirm, setShowBulkConfirm] = useState<boolean | 'active' | 'inactive'>(false);
+
+    const handleBulkStatusUpdate = async (active: boolean) => {
+        if (!debouncedSearch) return;
+        setIsBulkUpdating(true);
+        try {
+            const res = await apiFetch(`/contacts/bulk-status`, {
+                method: "POST",
+                body: JSON.stringify({ search: debouncedSearch, active }),
+            });
+            if (res.ok) {
+                setShowBulkConfirm(false);
+                fetchContactsWithCurrent();
+            }
+        } catch (err) {
+            console.error("Failed to bulk update");
+        } finally {
+            setIsBulkUpdating(false);
+        }
+    };
+
     const fetchContactsWithCurrent = () => fetchContacts(currentPage, debouncedSearch);
 
     return (
@@ -191,8 +213,8 @@ export default function ContactsPage() {
                 </button>
             </header>
 
-            <div style={{ display: "flex", gap: "1rem" }}>
-                <div style={{ position: "relative", flex: 1 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
+                <div style={{ position: "relative", flex: 1, minWidth: "300px" }}>
                     <Search style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: "#64748b" }} />
                     <input
                         value={search}
@@ -201,7 +223,27 @@ export default function ContactsPage() {
                         style={{ width: "100%", background: "rgba(15,23,42,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "1rem", padding: "0.875rem 1rem 0.875rem 2.75rem", color: "#f8fafc", fontFamily: "inherit", fontSize: "0.875rem", outline: "none" }}
                     />
                 </div>
-                <button style={{ padding: "0 1.5rem", background: "rgba(15,23,42,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "1rem", color: "#64748b", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem" }}>
+
+                {debouncedSearch && (
+                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                        <button
+                            onClick={() => setShowBulkConfirm('inactive')}
+                            style={{ padding: "0.875rem 1.25rem", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "1rem", color: "#f87171", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem" }}
+                        >
+                            <PowerOff style={{ width: 16, height: 16 }} />
+                            {C.bulkDeactivate.replace('{search}', debouncedSearch)}
+                        </button>
+                        <button
+                            onClick={() => setShowBulkConfirm('active')}
+                            style={{ padding: "0.875rem 1.25rem", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: "1rem", color: "#10b981", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem" }}
+                        >
+                            <Power style={{ width: 16, height: 16 }} />
+                            {C.bulkActivate.replace('{search}', debouncedSearch)}
+                        </button>
+                    </div>
+                )}
+
+                <button style={{ padding: "0.875rem 1.5rem", background: "rgba(15,23,42,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "1rem", color: "#64748b", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem" }}>
                     <Filter style={{ width: 16, height: 16 }} />{C.filters}
                 </button>
             </div>
@@ -477,6 +519,40 @@ export default function ContactsPage() {
                             </button>
                             <button
                                 onClick={() => setShowDeleteConfirm(false)}
+                                style={{ flex: 1, padding: "1rem", background: "rgba(255,255,255,0.05)", color: "#64748b", border: "none", borderRadius: "1rem", fontWeight: 700, cursor: "pointer" }}
+                            >
+                                {C.cancel}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Confirmación Bulk Update */}
+            {showBulkConfirm && (
+                <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)" }}>
+                    <div className="glass" style={{ width: "90%", maxWidth: 400, borderRadius: "2rem", padding: "2.5rem", textAlign: "center" }}>
+                        <div style={{ width: 60, height: 60, borderRadius: "1.5rem", background: showBulkConfirm === 'active' ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", color: showBulkConfirm === 'active' ? "#10b981" : "#f87171", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.5rem" }}>
+                            {showBulkConfirm === 'active' ? <Power style={{ width: 30, height: 30 }} /> : <PowerOff style={{ width: 30, height: 30 }} />}
+                        </div>
+                        <h3 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: "0.75rem" }}>
+                            {showBulkConfirm === 'active' ? C.bulkActivate.replace('{search}', debouncedSearch) : C.bulkDeactivate.replace('{search}', debouncedSearch)}
+                        </h3>
+                        <p style={{ color: "#64748b", marginBottom: "2rem", lineHeight: "1.5" }}>
+                            {C.confirmBulk.replace('{search}', debouncedSearch)}
+                        </p>
+
+                        <div style={{ display: "flex", gap: "1rem" }}>
+                            <button
+                                onClick={() => handleBulkStatusUpdate(showBulkConfirm === 'active')}
+                                disabled={isBulkUpdating}
+                                style={{ flex: 1, padding: "1rem", background: showBulkConfirm === 'active' ? "#10b981" : "#f87171", color: "white", border: "none", borderRadius: "1rem", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}
+                            >
+                                {isBulkUpdating ? <Loader2 style={{ width: 18, height: 18, animation: "spin 1s linear infinite" }} /> : (showBulkConfirm === 'active' ? <Power style={{ width: 18, height: 18 }} /> : <PowerOff style={{ width: 18, height: 18 }} />)}
+                                {showBulkConfirm === 'active' ? C.activate : C.deactivate}
+                            </button>
+                            <button
+                                onClick={() => setShowBulkConfirm(false)}
                                 style={{ flex: 1, padding: "1rem", background: "rgba(255,255,255,0.05)", color: "#64748b", border: "none", borderRadius: "1rem", fontWeight: 700, cursor: "pointer" }}
                             >
                                 {C.cancel}
