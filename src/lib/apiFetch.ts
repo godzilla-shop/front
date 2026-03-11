@@ -22,7 +22,9 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
         delete headers['Content-Type'];
     }
 
-    return fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
+    return fetch(`${baseUrl}${path}`, {
         ...options,
         headers,
     });
