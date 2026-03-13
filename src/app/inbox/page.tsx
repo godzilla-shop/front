@@ -44,6 +44,9 @@ export default function InboxPage() {
       })) as Chat[];
       setChats(chatList);
       setLoading(false);
+    }, (error) => {
+      console.error("🔥 Firestore Chats Error:", error);
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -64,6 +67,8 @@ export default function InboxPage() {
         ...doc.data(),
       })) as Message[];
       setMessages(msgList);
+    }, (error) => {
+      console.error("🔥 Firestore Messages Error:", error);
     });
 
     return () => unsubscribe();

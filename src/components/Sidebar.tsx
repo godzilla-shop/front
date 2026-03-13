@@ -36,7 +36,7 @@ export default function Sidebar() {
         { name: N.contacts, href: "/contacts", icon: Users },
         { name: N.import, href: "/import", icon: FileUp },
         { name: t.nav.history, href: "/history", icon: History },
-        { name: t.nav.inbox, href: "/inbox", icon: MessageCircle },
+        // { name: t.nav.inbox, href: "/inbox", icon: MessageCircle },
         { name: t.nav.config, href: "/config", icon: Settings },
     ];
 
