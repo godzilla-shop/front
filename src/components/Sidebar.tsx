@@ -10,7 +10,8 @@ import {
     Settings,
     LogOut,
     MessageSquare,
-    Activity,
+    History,
+    MessageCircle,
     Menu,
     X
 } from "lucide-react";
@@ -34,8 +35,9 @@ export default function Sidebar() {
         { name: N.dashboard, href: "/", icon: LayoutDashboard },
         { name: N.contacts, href: "/contacts", icon: Users },
         { name: N.import, href: "/import", icon: FileUp },
-        { name: N.history, href: "/history", icon: Activity },
-        { name: N.config, href: "/config", icon: Settings },
+        { name: t.nav.history, href: "/history", icon: History },
+        { name: t.nav.inbox, href: "/inbox", icon: MessageCircle },
+        { name: t.nav.config, href: "/config", icon: Settings },
     ];
 
     const handleLogout = async () => {
