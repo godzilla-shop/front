@@ -5,7 +5,7 @@ import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit, doc, addDoc, serverTimestamp } from "firebase/firestore";
 import { useLang } from "@/context/LangContext";
 import api from "@/lib/api";
-import { MessageCircle, Search, Send, User } from "lucide-react";
+import { MessageCircle, Search, Send, User, ArrowLeft } from "lucide-react";
 
 interface Chat {
   id: string;
@@ -115,7 +115,7 @@ export default function InboxPage() {
   return (
     <div className="flex h-[calc(100vh-120px)] bg-slate-900/50 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl backdrop-blur-sm">
       {/* Sidebar: Chat List */}
-      <div className="w-1/3 border-r border-slate-800 flex flex-col bg-slate-900/40">
+      <div className={`border-r border-slate-800 flex-col bg-slate-900/40 w-full md:w-1/3 ${selectedChat ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-slate-800">
           <h1 className="text-xl font-bold text-white mb-4">{t.inbox.title}</h1>
           <div className="relative">
@@ -164,17 +164,24 @@ export default function InboxPage() {
       </div>
 
       {/* Main: Chat Window */}
-      <div className="flex-1 flex flex-col bg-slate-900/20 relative">
+      <div className={`flex-col bg-slate-900/20 relative w-full md:flex-1 ${!selectedChat ? 'hidden md:flex' : 'flex'}`}>
         {selectedChat ? (
           <>
             {/* Chat Header */}
-            <div className="p-4 border-b border-slate-800 bg-slate-900/60 flex items-center gap-4 backdrop-blur-md">
-              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center border border-slate-700">
+            <div className="p-4 border-b border-slate-800 bg-slate-900/60 flex items-center gap-4 backdrop-blur-md z-10">
+              <button 
+                onClick={() => setSelectedChat(null)}
+                className="md:hidden p-2 -ml-2 text-slate-400 hover:text-white transition-colors"
+                aria-label="Back to chat list"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center border border-slate-700 shrink-0">
                 <User className="w-5 h-5 text-blue-400" />
               </div>
-              <div>
-                <h2 className="text-white font-semibold">{selectedChat.name}</h2>
-                <p className="text-xs text-slate-500">+{selectedChat.phone}</p>
+              <div className="overflow-hidden">
+                <h2 className="text-white font-semibold truncate">{selectedChat.name}</h2>
+                <p className="text-xs text-slate-500 truncate">+{selectedChat.phone}</p>
               </div>
             </div>
 
