@@ -30,16 +30,13 @@ export default function Dashboard() {
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   const fetchStatus = () => {
-    apiFetch("/status")
+    apiFetch(`/status?lang=${t.locale}`)
       .then((r) => r.json())
       .then((data: StatusData) => {
         setStatus(data);
         if (data.chart) {
-          const chartData = DAYS.map((name, idx) => ({
-            name,
-            envios: data.chart[idx] || 0
-          }));
-          setChart(chartData);
+          // data.chart is now already an array of { name: 'Day', envios: count } in the correct order
+          setChart(data.chart as any);
         }
         setLoading(false);
       })
