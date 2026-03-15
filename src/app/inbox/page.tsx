@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { db } from "@/lib/firebase"; 
-import { collection, query, orderBy, onSnapshot, limit, doc, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, limit, doc, addDoc, serverTimestamp, where, Timestamp } from "firebase/firestore";
 import { useLang } from "@/context/LangContext";
 import api from "@/lib/api";
-import { MessageCircle, Search, Send, User, ArrowLeft } from "lucide-react";
+import { MessageCircle, Search, Send, User, ArrowLeft, History, CalendarDays } from "lucide-react";
 
 interface Chat {
   id: string;
@@ -33,10 +33,31 @@ export default function InboxPage() {
   const [newMessage, setNewMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"today" | "all">("today");
 
-  // Load Chats
+  // Load Chats with Filter Optimization
   useEffect(() => {
-    const q = query(collection(db, "chats"), orderBy("updatedAt", "desc"), limit(50));
+    setLoading(true);
+    
+    let q;
+    if (filter === "today") {
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      
+      q = query(
+        collection(db, "chats"), 
+        where("updatedAt", ">=", Timestamp.fromDate(startOfToday)),
+        orderBy("updatedAt", "desc"), 
+        limit(50)
+      );
+    } else {
+      q = query(
+        collection(db, "chats"), 
+        orderBy("updatedAt", "desc"), 
+        limit(50)
+      );
+    }
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const chatList = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -50,7 +71,7 @@ export default function InboxPage() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [filter]);
 
   // Load Messages for Selected Chat
   useEffect(() => {
@@ -59,7 +80,7 @@ export default function InboxPage() {
     const q = query(
       collection(db, "chats", selectedChat.id, "messages"),
       orderBy("timestamp", "asc"),
-      limit(100)
+      limit(30)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const msgList = snapshot.docs.map((doc) => ({
@@ -118,6 +139,29 @@ export default function InboxPage() {
       <div className={`border-r border-slate-800 flex-col bg-slate-900/40 w-full md:w-1/3 ${selectedChat ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-slate-800">
           <h1 className="text-xl font-bold text-white mb-4">{t.inbox.title}</h1>
+          
+          {/* Optimization Filters */}
+          <div className="flex gap-2 mb-4 p-1 bg-slate-800/50 rounded-xl border border-slate-700">
+            <button 
+              onClick={() => setFilter("today")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+                filter === "today" ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <CalendarDays className="w-3.5 h-3.5" />
+              {t.inbox.today}
+            </button>
+            <button 
+              onClick={() => setFilter("all")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+                filter === "all" ? "bg-slate-700 text-white shadow-lg" : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <History className="w-3.5 h-3.5" />
+              {t.inbox.history}
+            </button>
+          </div>
+
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input

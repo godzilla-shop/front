@@ -33,6 +33,8 @@ export const translations = {
             selectChat: 'Seleziona una chat per iniziare a messaggiare',
             typeMessage: 'Scrivi un messaggio...',
             send: 'Invia',
+            today: 'Oggi',
+            history: 'Tutti i messaggi',
         },
         dashboard: {
             title: 'Bentornato',
@@ -166,6 +168,8 @@ export const translations = {
             selectChat: 'Selecciona un chat para comenzar a mensajear',
             typeMessage: 'Escribe un mensaje...',
             send: 'Enviar',
+            today: 'Hoy',
+            history: 'Todos los mensajes',
         },
         dashboard: {
             title: 'Bienvenido de nuevo',
