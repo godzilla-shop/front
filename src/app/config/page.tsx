@@ -12,6 +12,7 @@ export default function ConfigPage() {
     const [delay, setDelay] = useState<number>(2);
     const [perDay, setPerDay] = useState<number>(50);
     const [startTime, setStartTime] = useState<string>("09:00");
+    const [template, setTemplate] = useState<string>("nuovo_numero_godzilla");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -25,6 +26,7 @@ export default function ConfigPage() {
                 if (data.messagesPerDay !== undefined) setPerDay(data.messagesPerDay);
                 if (data.delayBetweenMessages !== undefined) setDelay(data.delayBetweenMessages);
                 if (data.startTime !== undefined) setStartTime(data.startTime);
+                if (data.whatsappTemplate !== undefined) setTemplate(data.whatsappTemplate);
                 setLoading(false);
             })
             .catch(() => {
@@ -41,7 +43,8 @@ export default function ConfigPage() {
                 body: JSON.stringify({
                     messagesPerDay: perDay,
                     delayBetweenMessages: delay,
-                    startTime: startTime
+                    startTime: startTime,
+                    whatsappTemplate: template
                 }),
             });
             if (res.ok) {
@@ -61,6 +64,7 @@ export default function ConfigPage() {
         setDelay(2);
         setPerDay(50);
         setStartTime("09:00");
+        setTemplate("nuovo_numero_godzilla");
         setSaved(false);
     };
 
@@ -134,6 +138,18 @@ export default function ConfigPage() {
                                 style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "1rem", padding: "1rem 1.25rem", color: "#f8fafc", fontFamily: "inherit", fontSize: "1rem", outline: "none" }}
                             />
                             <p style={{ fontSize: "0.75rem", color: "#475569", paddingLeft: "0.25rem" }}>{CF.delayHelp}</p>
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                            <label style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#64748b" }}>{CF.templateName}</label>
+                            <input
+                                type="text"
+                                value={template}
+                                onChange={(e) => setTemplate(e.target.value)}
+                                placeholder="es: nuovo_numero_godzilla"
+                                style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "1rem", padding: "1rem 1.25rem", color: "#f8fafc", fontFamily: "inherit", fontSize: "1rem", outline: "none" }}
+                            />
+                            <p style={{ fontSize: "0.75rem", color: "#475569", paddingLeft: "0.25rem" }}>{CF.templateHelp}</p>
                         </div>
 
                         {error && (
