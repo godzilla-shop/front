@@ -13,9 +13,11 @@ export default function ConfigPage() {
     const [perDay, setPerDay] = useState<number>(50);
     const [startTime, setStartTime] = useState<string>("09:00");
     const [template, setTemplate] = useState<string>("nuovo_numero_godzilla");
+    const [paused, setPaused] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [togglingPause, setTogglingPause] = useState(false);
     const [error, setError] = useState("");
 
     // Load config from backend on mount
@@ -27,6 +29,7 @@ export default function ConfigPage() {
                 if (data.delayBetweenMessages !== undefined) setDelay(data.delayBetweenMessages);
                 if (data.startTime !== undefined) setStartTime(data.startTime);
                 if (data.whatsappTemplate !== undefined) setTemplate(data.whatsappTemplate);
+                if (data.paused !== undefined) setPaused(data.paused);
                 setLoading(false);
             })
             .catch(() => {
@@ -62,6 +65,28 @@ export default function ConfigPage() {
         }
     };
 
+    const handleTogglePause = async () => {
+        setTogglingPause(true);
+        setError("");
+        try {
+            const res = await apiFetch(`/config/pause`, {
+                method: "PATCH",
+                body: JSON.stringify({ paused: !paused }),
+            });
+            if (res.ok) {
+                setPaused(!paused);
+            } else if (res.status === 401) {
+                setError("Sesión expirada. Recarga la página e intenta de nuevo.");
+            } else {
+                setError("Error al cambiar estado del bot. Intenta de nuevo.");
+            }
+        } catch {
+            setError("No se pudo conectar con el servidor.");
+        } finally {
+            setTogglingPause(false);
+        }
+    };
+
     const handleReset = () => {
         setDelay(2);
         setPerDay(50);
@@ -81,6 +106,54 @@ export default function ConfigPage() {
                     <p style={{ color: "#64748b", marginTop: "0.25rem" }}>{CF.subtitle}</p>
                 </div>
             </header>
+
+            {/* Bot status banner */}
+            <div style={{
+                borderRadius: "1rem",
+                padding: "1rem 1.5rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "1rem",
+                background: paused ? "rgba(239,68,68,0.08)" : "rgba(16,185,129,0.08)",
+                border: `1px solid ${paused ? "rgba(239,68,68,0.2)" : "rgba(16,185,129,0.2)"}`,
+            }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                    <div style={{
+                        width: 10, height: 10, borderRadius: "50%",
+                        background: paused ? "#ef4444" : "#10b981",
+                        boxShadow: `0 0 6px ${paused ? "#ef4444" : "#10b981"}`,
+                    }} />
+                    <span style={{ fontWeight: 600, fontSize: "0.9rem", color: paused ? "#ef4444" : "#10b981" }}>
+                        {paused ? "Bot detenido" : "Bot activo"}
+                    </span>
+                    <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
+                        {paused ? "El envío automático está pausado." : "El envío automático está en funcionamiento."}
+                    </span>
+                </div>
+                <button
+                    onClick={handleTogglePause}
+                    disabled={togglingPause || loading}
+                    style={{
+                        display: "flex", alignItems: "center", gap: "0.5rem",
+                        padding: "0.5rem 1.25rem",
+                        background: paused ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)",
+                        border: `1px solid ${paused ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`,
+                        borderRadius: "0.75rem",
+                        color: paused ? "#10b981" : "#ef4444",
+                        cursor: togglingPause || loading ? "not-allowed" : "pointer",
+                        fontFamily: "inherit", fontWeight: 700, fontSize: "0.875rem",
+                        opacity: togglingPause || loading ? 0.6 : 1,
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {togglingPause
+                        ? <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
+                        : null
+                    }
+                    {paused ? "Reanudar bot" : "Detener bot"}
+                </button>
+            </div>
 
             <div className="glass" style={{ borderRadius: "1.5rem", padding: "2rem", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                 <h3 style={{ fontWeight: 700, borderBottom: "1px solid rgba(255,255,255,0.05)", paddingBottom: "1rem" }}>{CF.sendParams}</h3>
