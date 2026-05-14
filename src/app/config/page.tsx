@@ -50,6 +50,8 @@ export default function ConfigPage() {
             if (res.ok) {
                 setSaved(true);
                 setTimeout(() => setSaved(false), 2500);
+            } else if (res.status === 401) {
+                setError("Sesión expirada. Recarga la página e intenta de nuevo.");
             } else {
                 setError("Error al guardar. Intenta de nuevo.");
             }
