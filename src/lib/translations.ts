@@ -57,7 +57,11 @@ export const translations = {
             empty: 'Vuota',
             startCampaign: 'Avvia Campagna',
             campaignSuccess: '🚀 Campagna avviata con successo per Godzilla Shop!',
-            campaignError: '❌ Errore durante l\'avvio della campagna.'
+            campaignError: '❌ Errore durante l\'avvio della campagna.',
+            billingIssue: 'Pagati Non Consegnati',
+            paidNotDelivered: 'Prob. account Meta',
+            undeliverable: 'Numero Non Valido',
+            noWhatsapp: 'Senza WhatsApp',
         },
         contacts: {
             title: 'Gestione Contatti',
@@ -192,7 +196,11 @@ export const translations = {
             empty: 'Vacía',
             startCampaign: 'Iniciar Campaña',
             campaignSuccess: '🚀 ¡Campaña de Godzilla Shop iniciada con éxito!',
-            campaignError: '❌ Error al iniciar la campaña.'
+            campaignError: '❌ Error al iniciar la campaña.',
+            billingIssue: 'Pagados No Entregados',
+            paidNotDelivered: 'Prob. cuenta Meta',
+            undeliverable: 'Número No Válido',
+            noWhatsapp: 'Sin WhatsApp',
         },
         contacts: {
             title: 'Gestión de Contactos',

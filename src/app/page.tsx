@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Send, Clock, TrendingUp, Loader2, Wifi, WifiOff, Play, CheckCircle2, AlertCircle, X } from "lucide-react";
+import { Users, Send, Clock, TrendingUp, Loader2, Wifi, WifiOff, Play, CheckCircle2, AlertCircle, X, AlertTriangle, PhoneOff } from "lucide-react";
 import { AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useLang } from "@/context/LangContext";
 import { apiFetch } from "@/lib/apiFetch";
@@ -11,7 +11,7 @@ const DAYS_ES = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
 interface StatusData {
   whatsapp: { status: string; phoneNumber?: string; name?: string; quality?: string; error?: string };
-  contacts: { total: number; sent: number; pending: number; failed: number; deliveryRate: number };
+  contacts: { total: number; sent: number; pending: number; billingIssue: number; undeliverable: number; deliveryRate: number };
   chart: number[];
   config: { messagesPerDay: number; delayBetweenMessages: number };
 }
@@ -26,8 +26,9 @@ export default function Dashboard() {
   const [isStarting, setIsStarting] = useState(false);
   const [chart, setChart] = useState<{ name: string; envios: number }[]>([]);
 
-  // Custom notification state
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [showRetryModal, setShowRetryModal] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   const fetchStatus = () => {
     apiFetch(`/status?lang=${t.locale}`)
@@ -50,6 +51,28 @@ export default function Dashboard() {
   const showToast = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 5000); // Auto-hide after 5s
+  };
+
+  const handleRetryBilling = async () => {
+    setIsRetrying(true);
+    setShowRetryModal(false);
+    try {
+      const res = await apiFetch("/contacts/retry-billing", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setTimeout(fetchStatus, 1500);
+        showToast('success', t.locale === 'it'
+          ? `✅ ${data.count} contatti riattivati con successo.`
+          : `✅ ${data.count} contactos reactivados con éxito.`
+        );
+      } else {
+        showToast('error', t.locale === 'it' ? '❌ Errore durante la riattivazione.' : '❌ Error al reactivar.');
+      }
+    } catch {
+      showToast('error', t.locale === 'it' ? '❌ Errore di connessione.' : '❌ Error de conexión.');
+    } finally {
+      setIsRetrying(false);
+    }
   };
 
   const handleStartCampaign = async () => {
@@ -130,11 +153,71 @@ export default function Dashboard() {
         <p style={{ color: "#64748b", marginTop: "0.25rem" }}>{D.subtitle}</p>
       </header>
 
+      {/* Modal confirmación reintento */}
+      {showRetryModal && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 2000,
+          background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)",
+          display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem"
+        }}>
+          <div className="glass" style={{ borderRadius: "1.5rem", padding: "2rem", maxWidth: 420, width: "100%" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
+              <AlertTriangle style={{ width: 28, height: 28, color: "#f97316" }} />
+              <h3 style={{ fontSize: "1.125rem", fontWeight: 700 }}>
+                {t.locale === 'it' ? 'Attenzione' : 'Atención'}
+              </h3>
+            </div>
+            <p style={{ color: "#94a3b8", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+              {t.locale === 'it'
+                ? `Questi ${(c?.billingIssue ?? 0).toLocaleString()} contatti sono stati già addebitati da Meta ma non consegnati a causa di un problema con l'account. Riprovare genererà nuovi addebiti da parte di Meta.`
+                : `Estos ${(c?.billingIssue ?? 0).toLocaleString()} contactos ya fueron cobrados por Meta pero no entregados por un problema de cuenta. Reintentar generará nuevos cobros por parte de Meta.`
+              }
+            </p>
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <button
+                onClick={() => setShowRetryModal(false)}
+                style={{
+                  flex: 1, padding: "0.75rem", borderRadius: "0.75rem",
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#94a3b8", cursor: "pointer", fontWeight: 600
+                }}
+              >
+                {t.locale === 'it' ? 'Annulla' : 'Cancelar'}
+              </button>
+              <button
+                onClick={handleRetryBilling}
+                style={{
+                  flex: 1, padding: "0.75rem", borderRadius: "0.75rem",
+                  background: "#f97316", border: "none",
+                  color: "white", cursor: "pointer", fontWeight: 600
+                }}
+              >
+                {t.locale === 'it' ? 'Confermo, Riprova' : 'Confirmo, Reintentar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Stats */}
       <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1.5rem" }}>
         <StatCard title={D.totalContacts} value={(c?.total ?? 0).toLocaleString()} sub={D.imported} icon={Users} />
         <StatCard title={D.sent} value={(c?.sent ?? 0).toLocaleString()} sub={D.total} icon={Send} color="#10b981" />
         <StatCard title={D.pending} value={(c?.pending ?? 0).toLocaleString()} sub={D.queue} icon={Clock} color="#f59e0b" />
+        <StatCard
+          title={D.billingIssue}
+          value={(c?.billingIssue ?? 0).toLocaleString()}
+          sub={D.paidNotDelivered}
+          icon={AlertTriangle}
+          color="#f97316"
+          onAction={(c?.billingIssue ?? 0) > 0 ? () => setShowRetryModal(true) : undefined}
+          actionLabel={isRetrying
+            ? (t.locale === 'it' ? 'Riattivando...' : 'Reactivando...')
+            : (t.locale === 'it' ? 'Riprova Invio' : 'Reintentar Envío')
+          }
+          actionDisabled={isRetrying}
+        />
+        <StatCard title={D.undeliverable} value={(c?.undeliverable ?? 0).toLocaleString()} sub={D.noWhatsapp} icon={PhoneOff} color="#ef4444" />
         <StatCard title={D.rate} value={`${c?.deliveryRate ?? 0}%`} sub={D.average} icon={TrendingUp} color="#3b82f6" />
       </div>
 
@@ -213,9 +296,9 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ title, value, sub, icon: Icon, color = "#64748b" }: any) {
+function StatCard({ title, value, sub, icon: Icon, color = "#64748b", onAction, actionLabel, actionDisabled }: any) {
   return (
-    <div className="glass" style={{ borderRadius: "1.5rem", padding: "1.5rem" }}>
+    <div className="glass" style={{ borderRadius: "1.5rem", padding: "1.5rem", display: "flex", flexDirection: "column" }}>
       <div style={{ width: 40, height: 40, borderRadius: "0.75rem", background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem" }}>
         <Icon style={{ width: 20, height: 20, color }} />
       </div>
@@ -224,6 +307,26 @@ function StatCard({ title, value, sub, icon: Icon, color = "#64748b" }: any) {
         <span style={{ fontSize: "1.75rem", fontWeight: 700 }}>{value}</span>
         <span style={{ fontSize: "0.65rem", color: "#475569", fontWeight: 700, textTransform: "uppercase" }}>{sub}</span>
       </div>
+      {onAction && (
+        <button
+          onClick={onAction}
+          disabled={actionDisabled}
+          style={{
+            marginTop: "1rem",
+            padding: "0.5rem 0.75rem",
+            borderRadius: "0.5rem",
+            background: `${color}22`,
+            border: `1px solid ${color}44`,
+            color: color,
+            cursor: actionDisabled ? "not-allowed" : "pointer",
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            opacity: actionDisabled ? 0.6 : 1,
+          }}
+        >
+          {actionLabel}
+        </button>
+      )}
     </div>
   );
 }
