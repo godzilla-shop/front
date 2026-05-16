@@ -210,12 +210,6 @@ export default function Dashboard() {
           sub={D.paidNotDelivered}
           icon={AlertTriangle}
           color="#f97316"
-          onAction={(c?.billingIssue ?? 0) > 0 ? () => setShowRetryModal(true) : undefined}
-          actionLabel={isRetrying
-            ? (t.locale === 'it' ? 'Riattivando...' : 'Reactivando...')
-            : (t.locale === 'it' ? 'Riprova Invio' : 'Reintentar Envío')
-          }
-          actionDisabled={isRetrying}
         />
         <StatCard title={D.undeliverable} value={(c?.undeliverable ?? 0).toLocaleString()} sub={D.noWhatsapp} icon={PhoneOff} color="#ef4444" />
         <StatCard title={D.rate} value={`${c?.deliveryRate ?? 0}%`} sub={D.average} icon={TrendingUp} color="#3b82f6" />
