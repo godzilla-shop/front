@@ -1,13 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Send, TrendingUp, Loader2, Wifi, WifiOff, Play, CheckCircle2, AlertCircle, X, AlertTriangle, PhoneOff } from "lucide-react";
+import { Users, Send, Clock, TrendingUp, Loader2, Wifi, WifiOff, Play, CheckCircle2, AlertCircle, X, AlertTriangle, PhoneOff } from "lucide-react";
 import { AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useLang } from "@/context/LangContext";
 import { apiFetch } from "@/lib/apiFetch";
 
 const DAYS_IT = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
 const DAYS_ES = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+// Toggle these to bring back the raw contact-count metrics in the dashboard UI.
+// Kept hidden (not deleted) so they can be re-enabled with a one-line change.
+const SHOW_CONTACT_COUNT_CARDS = false;
+const SHOW_DB_QUEUE_ROWS = false;
 
 interface StatusData {
   whatsapp: { status: string; phoneNumber?: string; name?: string; quality?: string; error?: string };
@@ -210,7 +215,13 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1.5rem" }}>
+        {SHOW_CONTACT_COUNT_CARDS && (
+          <StatCard title={D.totalContacts} value={(c?.total ?? 0).toLocaleString()} sub={D.imported} icon={Users} />
+        )}
         <StatCard title={D.sent} value={(c?.sent ?? 0).toLocaleString()} sub={D.total} icon={Send} color="#10b981" />
+        {SHOW_CONTACT_COUNT_CARDS && (
+          <StatCard title={D.pending} value={(c?.pending ?? 0).toLocaleString()} sub={D.queue} icon={Clock} color="#f59e0b" />
+        )}
         <StatCard
           title={D.billingIssue}
           value={(c?.billingIssue ?? 0).toLocaleString()}
@@ -268,6 +279,13 @@ export default function Dashboard() {
               </p>
             )}
           </div>
+
+          {SHOW_DB_QUEUE_ROWS && (
+            <>
+              <StatusRow label={D.totalDB} value={(c?.total ?? 0).toString()} dot="#3b82f6" />
+              <StatusRow label={D.queueStatus} value={(c?.pending ?? 0) > 0 ? D.processing : D.empty} dot={(c?.pending ?? 0) > 0 ? "#10b981" : "#3b82f6"} />
+            </>
+          )}
 
           <button
             onClick={handleStartCampaign}
@@ -328,6 +346,18 @@ function StatCard({ title, value, sub, icon: Icon, color = "#64748b", onAction, 
           {actionLabel}
         </button>
       )}
+    </div>
+  );
+}
+
+function StatusRow({ label, value, dot }: any) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255,255,255,0.03)", padding: "0.875rem 1rem", borderRadius: "0.75rem" }}>
+      <span style={{ color: "#64748b", fontSize: "0.875rem" }}>{label}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div style={{ width: 8, height: 8, borderRadius: "50%", background: dot, animation: "pulse 2s infinite" }} />
+        <span style={{ fontWeight: 700, fontSize: "0.875rem" }}>{value}</span>
+      </div>
     </div>
   );
 }
