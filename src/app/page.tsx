@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Send, Clock, TrendingUp, Loader2, Wifi, WifiOff, Play, CheckCircle2, AlertCircle, X, AlertTriangle, PhoneOff } from "lucide-react";
+import { Send, TrendingUp, Loader2, Wifi, WifiOff, Play, CheckCircle2, AlertCircle, X, AlertTriangle, PhoneOff } from "lucide-react";
 import { AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useLang } from "@/context/LangContext";
 import { apiFetch } from "@/lib/apiFetch";
@@ -210,9 +210,7 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1.5rem" }}>
-        <StatCard title={D.totalContacts} value={(c?.total ?? 0).toLocaleString()} sub={D.imported} icon={Users} />
         <StatCard title={D.sent} value={(c?.sent ?? 0).toLocaleString()} sub={D.total} icon={Send} color="#10b981" />
-        <StatCard title={D.pending} value={(c?.pending ?? 0).toLocaleString()} sub={D.queue} icon={Clock} color="#f59e0b" />
         <StatCard
           title={D.billingIssue}
           value={(c?.billingIssue ?? 0).toLocaleString()}
