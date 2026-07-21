@@ -269,9 +269,6 @@ export default function Dashboard() {
             )}
           </div>
 
-          <StatusRow label={D.totalDB} value={(c?.total ?? 0).toString()} dot="#3b82f6" />
-          <StatusRow label={D.queueStatus} value={(c?.pending ?? 0) > 0 ? D.processing : D.empty} dot={(c?.pending ?? 0) > 0 ? "#10b981" : "#3b82f6"} />
-
           <button
             onClick={handleStartCampaign}
             disabled={isStarting || status?.campaignRunning}
@@ -331,18 +328,6 @@ function StatCard({ title, value, sub, icon: Icon, color = "#64748b", onAction, 
           {actionLabel}
         </button>
       )}
-    </div>
-  );
-}
-
-function StatusRow({ label, value, dot }: any) {
-  return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255,255,255,0.03)", padding: "0.875rem 1rem", borderRadius: "0.75rem" }}>
-      <span style={{ color: "#64748b", fontSize: "0.875rem" }}>{label}</span>
-      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: dot, animation: "pulse 2s infinite" }} />
-        <span style={{ fontWeight: 700, fontSize: "0.875rem" }}>{value}</span>
-      </div>
     </div>
   );
 }
