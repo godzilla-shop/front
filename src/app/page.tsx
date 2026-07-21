@@ -14,6 +14,7 @@ interface StatusData {
   contacts: { total: number; sent: number; pending: number; billingIssue: number; undeliverable: number; deliveryRate: number };
   chart: number[];
   config: { messagesPerDay: number; delayBetweenMessages: number };
+  campaignRunning?: boolean;
 }
 
 export default function Dashboard() {
@@ -47,6 +48,14 @@ export default function Dashboard() {
   useEffect(() => {
     fetchStatus();
   }, []);
+
+  // While a campaign is running in the background, poll periodically so the
+  // button re-enables itself as soon as the backend releases the run lock.
+  useEffect(() => {
+    if (!status?.campaignRunning) return;
+    const interval = setInterval(fetchStatus, 5000);
+    return () => clearInterval(interval);
+  }, [status?.campaignRunning]);
 
   const showToast = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
@@ -267,7 +276,7 @@ export default function Dashboard() {
 
           <button
             onClick={handleStartCampaign}
-            disabled={isStarting}
+            disabled={isStarting || status?.campaignRunning}
             className="btn-primary"
             style={{
               marginTop: "auto",
@@ -278,11 +287,14 @@ export default function Dashboard() {
               alignItems: "center",
               justifyContent: "center",
               gap: "0.5rem",
-              opacity: isStarting ? 0.7 : 1
+              opacity: isStarting || status?.campaignRunning ? 0.7 : 1
             }}
           >
-            {isStarting ? <Loader2 style={{ width: 18, height: 18, animation: "spin 1s linear infinite" }} /> : <Play style={{ width: 18, height: 18 }} />}
-            {D.startCampaign}
+            {isStarting || status?.campaignRunning
+              ? <Loader2 style={{ width: 18, height: 18, animation: "spin 1s linear infinite" }} />
+              : <Play style={{ width: 18, height: 18 }} />
+            }
+            {status?.campaignRunning ? (t.locale === 'it' ? 'Campagna in corso...' : 'Campaña en curso...') : D.startCampaign}
           </button>
         </div>
       </div>
