@@ -9,6 +9,10 @@ import {
 import { useLang } from "@/context/LangContext";
 import { apiFetch } from "@/lib/apiFetch";
 
+// Toggle to bring back the "Mostrando X - Y de Z total" summary text.
+// Kept hidden (not deleted) so it can be re-enabled with a one-line change.
+const SHOW_PAGINATION_SUMMARY = false;
+
 export default function ContactsPage() {
     const { t } = useLang();
     const C = t.contacts;
@@ -374,9 +378,11 @@ export default function ContactsPage() {
             {/* Pagination Controls */}
             {!loading && totalPages > 1 && (
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem", padding: "1rem", background: "rgba(15,23,42,0.2)", borderRadius: "1.5rem" }}>
-                    <div style={{ color: "#64748b", fontSize: "0.875rem" }}>
-                        {C.showing} <span style={{ color: "#f8fafc", fontWeight: 600 }}>{((currentPage - 1) * limit) + 1}</span> - <span style={{ color: "#f8fafc", fontWeight: 600 }}>{Math.min(currentPage * limit, totalItems)}</span> {C.of} <span style={{ color: "#f8fafc", fontWeight: 600 }}>{totalItems}</span> {C.total}
-                    </div>
+                    {SHOW_PAGINATION_SUMMARY && (
+                        <div style={{ color: "#64748b", fontSize: "0.875rem" }}>
+                            {C.showing} <span style={{ color: "#f8fafc", fontWeight: 600 }}>{((currentPage - 1) * limit) + 1}</span> - <span style={{ color: "#f8fafc", fontWeight: 600 }}>{Math.min(currentPage * limit, totalItems)}</span> {C.of} <span style={{ color: "#f8fafc", fontWeight: 600 }}>{totalItems}</span> {C.total}
+                        </div>
+                    )}
 
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <button

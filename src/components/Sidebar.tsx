@@ -20,6 +20,10 @@ import { translations } from "@/lib/translations";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
+// Toggle to bring back the "Inbox" link in the sidebar nav.
+// Kept hidden (not deleted) so it can be re-enabled with a one-line change.
+const SHOW_INBOX_NAV = false;
+
 export default function Sidebar() {
     const pathname = usePathname();
     const { t, locale, setLocale } = useLang();
@@ -36,7 +40,7 @@ export default function Sidebar() {
         { name: N.contacts, href: "/contacts", icon: Users },
         { name: N.import, href: "/import", icon: FileUp },
         { name: t.nav.history, href: "/history", icon: History },
-        { name: t.nav.inbox, href: "/inbox", icon: MessageCircle },
+        ...(SHOW_INBOX_NAV ? [{ name: t.nav.inbox, href: "/inbox", icon: MessageCircle }] : []),
         { name: t.nav.config, href: "/config", icon: Settings },
     ];
 
