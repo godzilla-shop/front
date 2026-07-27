@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Users, Send, Clock, TrendingUp, Loader2, Wifi, WifiOff, Play, CheckCircle2, AlertCircle, X, AlertTriangle, PhoneOff } from "lucide-react";
+import { Users, Send, Clock, TrendingUp, Loader2, Wifi, WifiOff, Play, CheckCircle2, AlertCircle, X, AlertTriangle, PhoneOff, Globe } from "lucide-react";
 import { AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useLang } from "@/context/LangContext";
 import { apiFetch } from "@/lib/apiFetch";
@@ -17,7 +17,7 @@ const SHOW_DB_QUEUE_ROWS = false;
 
 interface StatusData {
   whatsapp: { status: string; phoneNumber?: string; name?: string; quality?: string; error?: string };
-  contacts: { total: number; sent: number; pending: number; billingIssue: number; undeliverable: number; deliveryRate: number };
+  contacts: { total: number; sent: number; pending: number; billingIssue: number; undeliverable: number; foreignNumber: number; deliveryRate: number };
   chart: number[];
   config: { messagesPerDay: number; delayBetweenMessages: number };
   campaignRunning?: boolean;
@@ -242,6 +242,15 @@ export default function Dashboard() {
           icon={PhoneOff}
           color="#ef4444"
           onAction={() => router.push('/contacts?onlyUndeliverable=true')}
+          actionLabel={t.locale === 'it' ? 'Vedi' : 'Ver'}
+        />
+        <StatCard
+          title={t.locale === 'it' ? 'Fuori dall\'Italia' : 'Fuera de Italia'}
+          value={(c?.foreignNumber ?? 0).toLocaleString()}
+          sub={t.locale === 'it' ? 'Esclusi preventivamente' : 'Excluidos preventivamente'}
+          icon={Globe}
+          color="#a855f7"
+          onAction={() => router.push('/contacts?onlyForeign=true')}
           actionLabel={t.locale === 'it' ? 'Vedi' : 'Ver'}
         />
         <StatCard title={D.rate} value={`${c?.deliveryRate ?? 0}%`} sub={D.average} icon={TrendingUp} color="#3b82f6" />

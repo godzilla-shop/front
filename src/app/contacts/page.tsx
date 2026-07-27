@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import {
     Search, Filter, CheckCircle2, Clock, MoreHorizontal, Plus, Users, X,
     User, Phone, Loader2, Edit2, Trash2, Power, PowerOff, AlertTriangle,
-    ChevronLeft, ChevronRight, PhoneOff
+    ChevronLeft, ChevronRight, PhoneOff, Globe
 } from "lucide-react";
 import { useLang } from "@/context/LangContext";
 import { apiFetch } from "@/lib/apiFetch";
@@ -28,6 +28,7 @@ function ContactsPageContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const onlyUndeliverable = searchParams.get('onlyUndeliverable') === 'true';
+    const onlyForeign = searchParams.get('onlyForeign') === 'true';
 
     const [contacts, setContacts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -65,6 +66,7 @@ function ContactsPageContent() {
             search: searchQuery
         });
         if (onlyUndeliverable) params.set('onlyUndeliverable', 'true');
+        if (onlyForeign) params.set('onlyForeign', 'true');
 
         apiFetch(`/contacts?${params.toString()}`)
             .then((r) => r.json())
@@ -88,7 +90,7 @@ function ContactsPageContent() {
 
     useEffect(() => {
         fetchContacts(currentPage, debouncedSearch);
-    }, [currentPage, debouncedSearch, onlyUndeliverable]);
+    }, [currentPage, debouncedSearch, onlyUndeliverable, onlyForeign]);
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -245,6 +247,27 @@ function ContactsPageContent() {
                     <button
                         onClick={() => router.push('/contacts')}
                         style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontWeight: 600, fontSize: "0.85rem", textDecoration: "underline" }}
+                    >
+                        {t.locale === 'it' ? 'Quitar filtro' : 'Quitar filtro'}
+                    </button>
+                </div>
+            )}
+
+            {onlyForeign && (
+                <div style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem",
+                    padding: "1rem 1.5rem", borderRadius: "1rem",
+                    background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)"
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                        <Globe style={{ width: 18, height: 18, color: "#c084fc" }} />
+                        <span style={{ color: "#c084fc", fontWeight: 600, fontSize: "0.9rem" }}>
+                            {t.locale === 'it' ? 'Contatti esclusi perché fuori dall\'Italia' : 'Contactos excluidos por no ser de Italia'}
+                        </span>
+                    </div>
+                    <button
+                        onClick={() => router.push('/contacts')}
+                        style={{ background: "none", border: "none", color: "#c084fc", cursor: "pointer", fontWeight: 600, fontSize: "0.85rem", textDecoration: "underline" }}
                     >
                         {t.locale === 'it' ? 'Quitar filtro' : 'Quitar filtro'}
                     </button>
