@@ -31,6 +31,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [isStarting, setIsStarting] = useState(false);
   const [chart, setChart] = useState<{ name: string; envios: number }[]>([]);
+  const [campaignCount, setCampaignCount] = useState<number>(10);
 
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [showRetryModal, setShowRetryModal] = useState(false);
@@ -93,7 +94,10 @@ export default function Dashboard() {
     if (isStarting) return;
     setIsStarting(true);
     try {
-      const res = await apiFetch("/messages/start-campaign", { method: "POST" });
+      const res = await apiFetch("/messages/start-campaign", {
+        method: "POST",
+        body: JSON.stringify({ count: campaignCount }),
+      });
       if (res.ok) {
         setTimeout(fetchStatus, 2000);
         showToast('success', D.campaignSuccess);
@@ -286,6 +290,29 @@ export default function Dashboard() {
               <StatusRow label={D.queueStatus} value={(c?.pending ?? 0) > 0 ? D.processing : D.empty} dot={(c?.pending ?? 0) > 0 ? "#10b981" : "#3b82f6"} />
             </>
           )}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <label style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b" }}>
+              {t.locale === 'it' ? 'Messaggi da inviare ora' : 'Mensajes a enviar ahora'}
+            </label>
+            <input
+              type="number"
+              min={1}
+              value={campaignCount}
+              onChange={(e) => setCampaignCount(Math.max(1, Number(e.target.value) || 1))}
+              disabled={isStarting || status?.campaignRunning}
+              style={{
+                background: "rgba(15,23,42,0.5)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: "0.75rem",
+                padding: "0.75rem 1rem",
+                color: "#f8fafc",
+                fontFamily: "inherit",
+                fontSize: "0.95rem",
+                outline: "none",
+              }}
+            />
+          </div>
 
           <button
             onClick={handleStartCampaign}
