@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
     Search, Filter, CheckCircle2, Clock, MoreHorizontal, Plus, Users, X,
     User, Phone, Loader2, Edit2, Trash2, Power, PowerOff, AlertTriangle,
-    ChevronLeft, ChevronRight
+    ChevronLeft, ChevronRight, PhoneOff
 } from "lucide-react";
 import { useLang } from "@/context/LangContext";
 import { apiFetch } from "@/lib/apiFetch";
@@ -14,8 +15,19 @@ import { apiFetch } from "@/lib/apiFetch";
 const SHOW_PAGINATION_SUMMARY = false;
 
 export default function ContactsPage() {
+    return (
+        <Suspense fallback={null}>
+            <ContactsPageContent />
+        </Suspense>
+    );
+}
+
+function ContactsPageContent() {
     const { t } = useLang();
     const C = t.contacts;
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const onlyUndeliverable = searchParams.get('onlyUndeliverable') === 'true';
 
     const [contacts, setContacts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -52,6 +64,7 @@ export default function ContactsPage() {
             limit: limit.toString(),
             search: searchQuery
         });
+        if (onlyUndeliverable) params.set('onlyUndeliverable', 'true');
 
         apiFetch(`/contacts?${params.toString()}`)
             .then((r) => r.json())
@@ -75,7 +88,7 @@ export default function ContactsPage() {
 
     useEffect(() => {
         fetchContacts(currentPage, debouncedSearch);
-    }, [currentPage, debouncedSearch]);
+    }, [currentPage, debouncedSearch, onlyUndeliverable]);
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -216,6 +229,27 @@ export default function ContactsPage() {
                     <Plus style={{ width: 18, height: 18 }} />{C.newContact}
                 </button>
             </header>
+
+            {onlyUndeliverable && (
+                <div style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem",
+                    padding: "1rem 1.5rem", borderRadius: "1rem",
+                    background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)"
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                        <PhoneOff style={{ width: 18, height: 18, color: "#f87171" }} />
+                        <span style={{ color: "#f87171", fontWeight: 600, fontSize: "0.9rem" }}>
+                            {t.locale === 'it' ? 'Mostrando solo contatti con numero non valido' : 'Mostrando solo contactos con número no válido'}
+                        </span>
+                    </div>
+                    <button
+                        onClick={() => router.push('/contacts')}
+                        style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontWeight: 600, fontSize: "0.85rem", textDecoration: "underline" }}
+                    >
+                        {t.locale === 'it' ? 'Quitar filtro' : 'Quitar filtro'}
+                    </button>
+                </div>
+            )}
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
                 <div style={{ position: "relative", flex: 1, minWidth: "300px" }}>

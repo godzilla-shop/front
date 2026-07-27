@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Users, Send, Clock, TrendingUp, Loader2, Wifi, WifiOff, Play, CheckCircle2, AlertCircle, X, AlertTriangle, PhoneOff } from "lucide-react";
 import { AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useLang } from "@/context/LangContext";
@@ -23,6 +24,7 @@ interface StatusData {
 }
 
 export default function Dashboard() {
+  const router = useRouter();
   const { t } = useLang();
   const D = t.dashboard;
   const DAYS = t.locale === "it" ? DAYS_IT : DAYS_ES;
@@ -233,7 +235,15 @@ export default function Dashboard() {
           icon={AlertTriangle}
           color="#f97316"
         />
-        <StatCard title={D.undeliverable} value={(c?.undeliverable ?? 0).toLocaleString()} sub={D.noWhatsapp} icon={PhoneOff} color="#ef4444" />
+        <StatCard
+          title={D.undeliverable}
+          value={(c?.undeliverable ?? 0).toLocaleString()}
+          sub={D.noWhatsapp}
+          icon={PhoneOff}
+          color="#ef4444"
+          onAction={() => router.push('/contacts?onlyUndeliverable=true')}
+          actionLabel={t.locale === 'it' ? 'Vedi' : 'Ver'}
+        />
         <StatCard title={D.rate} value={`${c?.deliveryRate ?? 0}%`} sub={D.average} icon={TrendingUp} color="#3b82f6" />
       </div>
 
