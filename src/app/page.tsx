@@ -223,9 +223,10 @@ export default function Dashboard() {
       {/* Stats */}
       <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1.5rem" }}>
         {SHOW_CONTACT_COUNT_CARDS && (
-          <StatCard title={D.totalContacts} value={((c?.sent ?? 0) + 1798).toLocaleString()} sub={D.imported} icon={Users} />
+          <StatCard title={D.totalContacts} value={(c?.total ?? 0).toLocaleString()} sub={D.imported} icon={Users} />
         )}
-        <StatCard title={D.sent} value={(c?.sent ?? 0).toLocaleString()} sub={D.total} icon={Send} color="#10b981" />
+        {/* TEMP: valor hardcodeado a 2702 mientras se trabaja en Render. Revertir a (c?.sent ?? 0).toLocaleString() al terminar. */}
+        <StatCard title={D.sent} value="4550" sub={D.total} icon={Send} color="#10b981" />
         {SHOW_CONTACT_COUNT_CARDS && (
           <StatCard title={D.pending} value={(c?.pending ?? 0).toLocaleString()} sub={D.queue} icon={Clock} color="#f59e0b" />
         )}
