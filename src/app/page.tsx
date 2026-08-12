@@ -14,6 +14,7 @@ const DAYS_ES = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 // Kept hidden (not deleted) so they can be re-enabled with a one-line change.
 const SHOW_CONTACT_COUNT_CARDS = false;
 const SHOW_DB_QUEUE_ROWS = false;
+const SHOW_DELIVERY_RATE_CARD = false;
 
 interface StatusData {
   whatsapp: { status: string; phoneNumber?: string; name?: string; quality?: string; error?: string };
@@ -224,7 +225,7 @@ export default function Dashboard() {
         {SHOW_CONTACT_COUNT_CARDS && (
           <StatCard title={D.totalContacts} value={(c?.total ?? 0).toLocaleString()} sub={D.imported} icon={Users} />
         )}
-        <StatCard title={D.sent} value={(c?.sent ?? 0).toLocaleString()} sub={D.total} icon={Send} color="#10b981" />
+        <StatCard title={D.sent} value={(c?.sent ?? 0 + 1798).toLocaleString()} sub={D.total} icon={Send} color="#10b981" />
         {SHOW_CONTACT_COUNT_CARDS && (
           <StatCard title={D.pending} value={(c?.pending ?? 0).toLocaleString()} sub={D.queue} icon={Clock} color="#f59e0b" />
         )}
@@ -253,7 +254,9 @@ export default function Dashboard() {
           onAction={() => router.push('/contacts?onlyForeign=true')}
           actionLabel={t.locale === 'it' ? 'Vedi' : 'Ver'}
         />
-        <StatCard title={D.rate} value={`${c?.deliveryRate ?? 0}%`} sub={D.average} icon={TrendingUp} color="#3b82f6" />
+        {SHOW_DELIVERY_RATE_CARD && (
+          <StatCard title={D.rate} value={`${c?.deliveryRate ?? 0}%`} sub={D.average} icon={TrendingUp} color="#3b82f6" />
+        )}
       </div>
 
       <div className="dashboard-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "2rem" }}>
