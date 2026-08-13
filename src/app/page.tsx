@@ -47,7 +47,13 @@ export default function Dashboard() {
         setStatus(data);
         if (data.chart) {
           // data.chart is now already an array of { name: 'Day', envios: count } in the correct order
-          setChart(data.chart as any);
+          // TEST: hardcodeo "Mar" (Martes) a 1700 y "Mié"/"Mer" (Miércoles, ES/IT) a 334 para prueba visual. Quitar este .map cuando termines.
+          const testChart = (data.chart as any[]).map((d) => {
+            if (d.name === "Mar") return { ...d, envios: 1700 };
+            if (d.name === "Mié" || d.name === "Mer") return { ...d, envios: 334 };
+            return d;
+          });
+          setChart(testChart);
         }
         setLoading(false);
       })
